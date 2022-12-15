@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -65,14 +66,19 @@ public class Day7 {
 
     private long solvePuzzle() {
         List<MyFile> candidates = findCandidates(root);
-        Optional<Long> result = candidates.stream().map(MyFile::getSize).reduce((a,b) -> { return a + b;});
-        return (result.orElse(0L));
+        candidates.sort(Comparator.comparingLong(MyFile::getSize));
+        return (candidates.get(0).getSize());
+    }
+
+    private long determineSpaceNeeded() {
+        long freeSpace = 70000000 - root.getSize();
+        return 30000000-freeSpace;
     }
 
     private List<MyFile> findCandidates(MyFile file) {
         List<MyFile> candidates = new ArrayList<>();
         if (file.isDirectory()) {
-            if (file.getSize() <= 100000) {
+            if (file.getSize() >= determineSpaceNeeded()) {
                 candidates.add(file);
             }
             file.getContainedFiles().forEach(f -> candidates.addAll(findCandidates(f)));
