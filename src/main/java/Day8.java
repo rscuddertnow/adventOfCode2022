@@ -47,45 +47,52 @@ public class Day8 {
             String[] treeRow = treeGridRows.get(i);
             int numOfCols = treeRow.length;
             for (int j = 0; j < numOfCols; j++) {
-                if (isVisible(i,j,numOfRows,numOfCols)) result++;
+                int visibilityScore = isVisiblityScore(i, j, numOfRows, numOfCols);
+                if (visibilityScore > result) result = visibilityScore;
             }
         }
         return result;
     }
 
-    private boolean isVisible(int row, int col, int maxRows, int maxCols) {
-        if (row == 0 || row == maxRows-1 
+    private int isVisiblityScore(int row, int col, int maxRows, int maxCols) {
+        int result =0;
+        if (row == 0 || row == maxRows-1
                 || col == 0 || col == maxCols-1) {
-            return true;
+            return result;
         } else {
             int originalValue = Integer.parseInt((treeGridRows.get(row))[col]);
-            boolean up =  isVisibleVertically(row - 1, col, originalValue, maxRows, -1);
-            boolean down = isVisibleVertically(row + 1, col, originalValue, maxRows, 1);
-            boolean left = isVisibleHorizontally(row, col - 1, originalValue, maxCols, -1);
-            boolean right = isVisibleHorizontally(row, col + 1, originalValue, maxCols, 1);
+            int up =  isVisibleVertically(row - 1, col, originalValue, maxRows, -1);
+            int down = isVisibleVertically(row + 1, col, originalValue, maxRows, 1);
+            int left = isVisibleHorizontally(row, col - 1, originalValue, maxCols, -1);
+            int right = isVisibleHorizontally(row, col + 1, originalValue, maxCols, 1);
 
-            return up || down || left || right;
+            return up * down * left * right;
         }
     }
 
-    private boolean isVisibleVertically(final int row, final int col, final int originalValue, final int maxRows, int crawlStep) {
-        int currentValue = Integer.parseInt((treeGridRows.get(row))[col]);
+    private int isVisibleVertically(final int row, final int col, final int originalValue, final int maxRows, int crawlStep) {
+        int iteration = 0;
+        for(int i=row; (i > -1 && i < maxRows); i=(i + crawlStep)) {
+            int currentValue = Integer.parseInt((treeGridRows.get(i))[col]);
+            iteration++;
 
-        if (row == 0 || row == maxRows-1) {
-            return (currentValue < originalValue);
+            if (currentValue >= originalValue) {
+                break;
+            }
         }
-
-        return ((currentValue < originalValue))
-                && isVisibleVertically((row + crawlStep), col, originalValue, maxRows, crawlStep);
+        return iteration;
     }
 
-    private boolean isVisibleHorizontally(final int row, final int col, final int originalValue, final int maxCols, int crawlStep) {
-        int currentValue = Integer.parseInt((treeGridRows.get(row))[col]);
-        if (col == 0 || col == maxCols-1) {
-            return (currentValue < originalValue);
-        }
+    private int isVisibleHorizontally(final int row, final int col, final int originalValue, final int maxCols, int crawlStep) {
+        int iteration = 0;
+        for(int i=col; (i > -1 && i < maxCols); i=(i + crawlStep)) {
+            int currentValue = Integer.parseInt((treeGridRows.get(row))[i]);
+            iteration++;
 
-        return ((currentValue < originalValue))
-                && isVisibleHorizontally(row, (col + crawlStep), originalValue, maxCols, crawlStep);
+            if (currentValue >= originalValue) {
+                break;
+            }
+        }
+        return iteration;
     }
 }
